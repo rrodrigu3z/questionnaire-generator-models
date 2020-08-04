@@ -1,0 +1,29 @@
+- name: t5-question-generation
+  predictor:
+    type: python
+    path: t5_question_generation.py
+    config:
+      pipeline: question-generation
+      model: valhalla/t5-base-qg-hl
+  networking:
+    local_port: 8989
+  compute:
+    cpu: 1
+    mem: 4G
+- name: gpt2-text-generation
+  predictor:
+    type: python
+    path: text_generation.py
+    config:
+      pipeline: text-generation
+      model: gpt2
+      decoding_params:
+        num_beams: 3
+        no_repeat_ngram_size: 2
+        num_return_sequences: 3
+        early_stopping: True
+  networking:
+    local_port: 9090
+  compute:
+    cpu: 1
+    mem: 4G

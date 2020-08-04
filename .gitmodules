@@ -1,0 +1,3 @@
+[submodule "predictors/t5_multitask_qa_qg/question_generation"]
+	path = predictors/question_generation
+	url = https://github.com/patil-suraj/question_generation.git
