@@ -27,3 +27,45 @@
   compute:
     cpu: 1
     mem: 4G
+- name: t5-distractor-generation
+  predictor:
+    type: python
+    path: t5_distractor_generation.py
+    config:
+      pipeline: distractor-generation
+      model: ./t5-distractor
+      base_model: t5-small
+      requires_download: True
+      download_path: https://rrodrigu3z-models.s3.amazonaws.com/t5-distractor-generation-small/
+      decoding_params:
+        do_sample: True
+        max_length: 512
+        top_k: 120
+        top_p: 0.98
+        early_stopping: True
+        num_return_sequences: 10
+  networking:
+    local_port: 9292
+  compute:
+    cpu: 1
+    mem: 4G
+- name: t5-question-paraphrase
+  predictor:
+    type: python
+    path: t5_question_paraphrase.py
+    config:
+      pipeline: question-paraphrase
+      model: ramsrigouthamg/t5_paraphraser
+      base_model: t5-base
+      decoding_params:
+        do_sample: True
+        max_length: 256
+        top_k: 120
+        top_p: 0.98
+        early_stopping: True
+        num_return_sequences: 10
+  networking:
+    local_port: 9191
+  compute:
+    cpu: 1
+    mem: 4G
