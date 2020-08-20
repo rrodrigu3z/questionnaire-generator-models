@@ -1,5 +1,7 @@
 # initialization code and variables can be declared here in global scope
 import nltk
+import spacy
+import en_core_web_lg
 from api_response import response
 from t5_model.pipelines import pipeline as t5_pipeline
 from utils.downloads import download_file
@@ -23,6 +25,8 @@ class PythonPredictor:
         """
         self.config = config
         self._download_model()
+        self.nlp = en_core_web_lg.load()
+
         self.distractor_generation = t5_pipeline(
             config["pipeline"],
             model=config["model"],
@@ -48,12 +52,23 @@ class PythonPredictor:
             **payload.get("decoding", {})
         }
 
-        return self.distractor_generation(
+        distractors = self.distractor_generation(
             payload["question"], payload["answer"], payload["context"],
             decoding)
 
+        return self._rank(distractors, self.nlp(payload["answer"]))
+
+    def _rank(self, distractors, nlp_answer):
+        """Adds a similarity score to each distractor"""
+        def add_rank(item):
+            nlp_distractor = self.nlp(item["distractor"])
+            item["similarity"] = nlp_answer.similarity(nlp_distractor)
+            return item
+        return list(map(add_rank, distractors))
+
     def _download_model(self):
         nltk.download("punkt")
+
         if self.config["requires_download"]:
             makedirs(self.config["model"], exist_ok=True)
             self._download_model_file(MODEL_CONFIG_FILE)

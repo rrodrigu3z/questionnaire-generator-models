@@ -84,7 +84,11 @@ class DistractorGenerationPipeline(T5GenerationPipeline):
         beam_outputs = self._generate(
             input_ids, attention_masks, decoding_params)
 
-        return self._decode(beam_outputs, answer)
+        return self._prepare(self._decode(beam_outputs, answer))
+
+    @staticmethod
+    def _prepare(predictions):
+        return list(map(lambda p: {"distractor": p}, predictions))
 
 
 SUPPORTED_PIPELINES = {
