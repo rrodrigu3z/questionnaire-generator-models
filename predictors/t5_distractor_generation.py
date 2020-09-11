@@ -5,6 +5,7 @@ import en_core_web_lg
 from api_response import response
 from t5_model.pipelines import pipeline as t5_pipeline
 from utils.downloads import download_file
+from utils.stop_words import remove_stop_words
 from os import path, makedirs
 
 
@@ -56,18 +57,21 @@ class PythonPredictor:
             payload["question"], payload["answer"], payload["context"],
             decoding)
 
-        return self._rank(distractors, self.nlp(payload["answer"]))
+        return self._rank(
+            distractors,
+            self.nlp(remove_stop_words(payload["answer"])))
 
     def _rank(self, distractors, nlp_answer):
         """Adds a similarity score to each distractor"""
         def add_rank(item):
-            nlp_distractor = self.nlp(item["distractor"])
+            nlp_distractor = self.nlp(remove_stop_words(item["distractor"]))
             item["similarity"] = nlp_answer.similarity(nlp_distractor)
             return item
         return list(map(add_rank, distractors))
 
     def _download_model(self):
         nltk.download("punkt")
+        nltk.download('stopwords')
 
         if self.config["requires_download"]:
             makedirs(self.config["model"], exist_ok=True)
