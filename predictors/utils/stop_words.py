@@ -1,6 +1,8 @@
 """Utility functions for handling stop words"""
 
 import nltk
+nltk.download('stopwords')
+
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 

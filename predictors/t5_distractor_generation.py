@@ -71,7 +71,6 @@ class PythonPredictor:
 
     def _download_model(self):
         nltk.download("punkt")
-        nltk.download('stopwords')
 
         if self.config["requires_download"]:
             makedirs(self.config["model"], exist_ok=True)
